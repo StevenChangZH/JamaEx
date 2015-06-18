@@ -1,7 +1,5 @@
 package JamaEx;
 
-import LocalAtom;
-
 import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -26,10 +24,10 @@ import JamaEx.util.Maths;
  * future version.
  * <P>
  * Five fundamental matrix decompositions, which consist of pairs or triples of
- * matrices, permutation vectors, and the like, produce results in five
- * decomposition classes. These decompositions are accessed by the Matrix class
- * to compute solutions of simultaneous linear equations, determinants, inverses
- * and other matrix functions. The five decompositions are:
+ * matrices, permutation vectors, and the like, produce Xs in five decomposition
+ * classes. These decompositions are accessed by the Matrix class to compute
+ * solutions of simultaneous linear equations, determinants, inverses and other
+ * matrix functions. The five decompositions are:
  * <P>
  * <UL>
  * <LI>Cholesky Decomposition of symmetric, positive definite matrices.
@@ -1273,35 +1271,53 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		// MatLab max simplified funtion
 		if (dim == 1) {
 			// row dimension
-			Matrix result = new Matrix(1, n);
+			Matrix X = new Matrix(1, n);
 			for (int j = 0; j < n; ++j) {
 				double max = A[0][j];
 				for (int i = 0; i < m; ++i) {
-					if (max<A[i][j]) {
+					if (max < A[i][j]) {
 						max = A[i][j];
 					}
 				}
-				result.set(0, j, max);
+				X.set(0, j, max);
 			}
-			return result;
+			return X;
 		} else if (dim == 2) {
 			// col dimension
-			Matrix result = new Matrix(m, 1);
+			Matrix X = new Matrix(m, 1);
 			for (int i = 0; i < m; ++i) {
 				double max = A[i][0];
 				for (int j = 0; j < n; ++j) {
-					if (max<A[i][j]) {
+					if (max < A[i][j]) {
 						max = A[i][j];
 					}
 				}
-				result.set(i, 0, max);
+				X.set(i, 0, max);
 			}
-			return result;
+			return X;
 		} else {
-			throw new Exception("row and col should be the same");
+			throw new IllegalArgumentException("row and col should be the same");
 		}
 	}
 	
+	/**
+	 * Return the max value of matrix data.
+	 * 
+	 * @author Steven Chang
+	 */
+	public double max() {
+		
+		double max = A[0][0];
+		for (int i=0; i<m; ++i) {
+			for(int j=0; j<n; ++j) {
+				if (max<A[i][j]) {
+					max = A[i][j];
+				}
+			}
+		}
+		return max;
+	}
+
 	/**
 	 * Return the min value of specifiec dimension.Read a matrix and specify the
 	 * dimension. dim can only be 1 or 2.
@@ -1315,33 +1331,51 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		// MatLab max simplified funtion
 		if (dim == 1) {
 			// row dimension
-			Matrix result = new Matrix(1, n);
+			Matrix X = new Matrix(1, n);
 			for (int j = 0; j < n; ++j) {
 				double min = A[0][j];
 				for (int i = 0; i < m; ++i) {
-					if (min>A[i][j]) {
+					if (min > A[i][j]) {
 						min = A[i][j];
 					}
 				}
-				result.set(0, j, min);
+				X.set(0, j, min);
 			}
-			return result;
+			return X;
 		} else if (dim == 2) {
 			// col dimension
-			Matrix result = new Matrix(m, 1);
+			Matrix X = new Matrix(m, 1);
 			for (int i = 0; i < m; ++i) {
 				double min = A[i][0];
 				for (int j = 0; j < n; ++j) {
-					if (min>A[i][j]) {
+					if (min > A[i][j]) {
 						min = A[i][j];
 					}
 				}
-				result.set(i, 0, min);
+				X.set(i, 0, min);
 			}
-			return result;
+			return X;
 		} else {
-			throw new Exception("row and col should be the same");
+			throw new IllegalArgumentException("row and col should be the same");
 		}
+	}
+	
+	/**
+	 * Return the min value of matrix data.
+	 * 
+	 * @author Steven Chang
+	 */
+	public double min() {
+		
+		double min = A[0][0];
+		for (int i=0; i<m; ++i) {
+			for(int j=0; j<n; ++j) {
+				if (min>A[i][j]) {
+					min = A[i][j];
+				}
+			}
+		}
+		return min;
 	}
 
 	/**
@@ -1358,28 +1392,28 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		// MatLab mean simplified funtion
 		if (dim == 1) {
 			// row dimension
-			Matrix result = new Matrix(1, n);
+			Matrix X = new Matrix(1, n);
 			for (int j = 0; j < n; ++j) {
 				double means = 0;
 				for (int i = 0; i < m; ++i) {
 					means += A[i][j];
 				}
-				result.set(0, j, means / (float) n);
+				X.set(0, j, means / (float) n);
 			}
-			return result;
+			return X;
 		} else if (dim == 2) {
 			// col dimension
-			Matrix result = new Matrix(m, 1);
+			Matrix X = new Matrix(m, 1);
 			for (int i = 0; i < m; ++i) {
 				double means = 0;
 				for (int j = 0; j < n; ++j) {
 					means += A[i][j];
 				}
-				result.set(i, 0, means / (float) m);
+				X.set(i, 0, means / (float) m);
 			}
-			return result;
+			return X;
 		} else {
-			throw new Exception("row and col should be the same");
+			throw new IllegalArgumentException("row and col should be the same");
 		}
 	}
 
@@ -1399,24 +1433,25 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
 		// MatLab repmat simplified function
 		if (r1 < 1 || r2 < 1) {
-			throw new Exception("r1 and r2 should be larger than 0");
+			throw new IllegalArgumentException("r1 and r2 should be larger than 0");
 		}
 		int nrow = m * r1;
 		int ncol = n * r2;
-		Matrix result = new Matrix(nrow, ncol);
+		Matrix X = new Matrix(nrow, ncol);
 		for (int i = 0; i < nrow; ++i) {
 			for (int j = 0; j < ncol; ++j) {
-				result.set(i, j, A[i % m][j % n]);
+				X.set(i, j, A[i % m][j % n]);
 			}
 		}
-		return result;
+		return X;
 	}
-	
+
 	/**
-	 * Realize the simplified version of reshape like MatLab. It will reshape the matrix
-	 * with given size. If the size is smaller than before, data at the end will be lost.
-	 * If the size is larger, duplicate the former data and add 0 to fill the matrix.
-	 * Throw exception if nrow or ncol less than 1.
+	 * Realize the simplified version of reshape like MatLab. It will reshape
+	 * the matrix with given size. If the size is smaller than before, data at
+	 * the end will be lost. If the size is larger, duplicate the former data
+	 * and add 0 to fill the matrix. Throw exception if nrow or ncol less than
+	 * 1.
 	 * 
 	 * @param nrow
 	 *            new row number of reshaped matrix
@@ -1425,95 +1460,194 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @author Steven Chang
 	 */
 	public Matrix reshape(int nrow, int ncol) throws Exception {
-		
+
 		// Simplified version of reshape method
 		if (nrow < 1 || ncol < 1) {
-			throw new Exception("nrow and ncol should be larger than 0");
+			throw new IllegalArgumentException("nrow and ncol should be larger than 0");
 		}
 		int tprow = 0;
 		int tpcol = 0;
-		if (nrow*ncol>=m*n) {
+		if (nrow * ncol >= m * n) {
 			// larger
-			Matrix result = new Matrix(nrow, ncol, 0.0);
-			for (int i=0; i<m; ++i) {
-				for (int j=0; j<n; ++j, ++tpcol) {
-					if (tpcol==ncol) {
+			Matrix X = new Matrix(nrow, ncol, 0.0);
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < n; ++j, ++tpcol) {
+					if (tpcol == ncol) {
 						++tprow;
 						tpcol = 0;
 					}
-					result.set(tprow, tpcol, A[i][j]);
+					X.set(tprow, tpcol, A[i][j]);
 				}
 			}
-			return result;
+			return X;
 		} else {
 			// smaller
-			Matrix result = new Matrix(nrow, ncol);
-			for (int i=0; i<nrow; ++i) {
-				for (int j=0; j<ncol; ++j, ++tpcol) {
-					if (tpcol==n) {
+			Matrix X = new Matrix(nrow, ncol);
+			for (int i = 0; i < nrow; ++i) {
+				for (int j = 0; j < ncol; ++j, ++tpcol) {
+					if (tpcol == n) {
 						++tprow;
 						tpcol = 0;
 					}
-					result.set(i, j, A[tprow][tpcol]);
+					X.set(i, j, A[tprow][tpcol]);
 				}
 			}
-			return result;
+			return X;
 		}
 	}
-	
+
 	/**
-	 * Perform two matrix concatenation. There are two kinds of cat:
-	 * if dim==1 then equals to MatLab code [src1, src2] -> cat by row
-	 * if dim==2 then equals to MatLab code [src1; src2] -> cat by col
-	 * For specified concatenaiton, num of rows or cols must be equal, or 
-	 * there will be an exception.
-	 * Also, if dim is not 1 or 2 throw exception.
+	 * Perform two matrix concatenation. There are two kinds of cat: if dim==1
+	 * then equals to MatLab code [src1, src2] -> cat by row if dim==2 then
+	 * equals to MatLab code [src1; src2] -> cat by col For specified
+	 * concatenaiton, num of rows or cols must be equal, or there will be an
+	 * exception. Also, if dim is not 1 or 2 throw exception.
 	 * 
 	 * @param src1
 	 *            matrix1
 	 * @param src2
 	 *            matrix2
-	 * @param dim dimension
+	 * @param dim
+	 *            dimension
 	 * @author Steven Chang
 	 */
-	public static Matrix concatenate(Matrix src1, Matrix src2, int dim) throws Exception {
-		
+	public static Matrix concatenate(Matrix src1, Matrix src2, int dim)
+			throws Exception {
+
 		if (dim == 1) {
 			// [src1, src2]
-			if (src1.getColumnDimension()!=src2.getColumnDimension()) {
-				throw new Exception("Number of col must be equal");
+			if (src1.getColumnDimension() != src2.getColumnDimension()) {
+				throw new IllegalArgumentException("Number of col must be equal");
 			}
 			int row1 = src1.getRowDimension();
 			int row2 = src2.getRowDimension();
 			int col = src1.getColumnDimension();
-			Matrix result = new Matrix(row1+row2, col);
-			result.setMatrix(0, row1, 0, col, src1);
-			result.setMatrix(row1, row1+row2, 0, col, src2);
-			return result;
+			Matrix X = new Matrix(row1 + row2, col);
+			X.setMatrix(0, row1, 0, col, src1);
+			X.setMatrix(row1, row1 + row2, 0, col, src2);
+			return X;
 		} else if (dim == 2) {
 			// [src1;src2]
-			if (src1.getRowDimension()!=src2.getRowDimension()) {
-				throw new Exception("Number of rows must be equal");
+			if (src1.getRowDimension() != src2.getRowDimension()) {
+				throw new IllegalArgumentException("Number of rows must be equal");
 			}
 			int row = src1.getRowDimension();
 			int col1 = src1.getColumnDimension();
 			int col2 = src2.getColumnDimension();
-			Matrix result = new Matrix(row, col1+col2);
-			result.setMatrix(0, row, 0, col1, src1);
-			result.setMatrix(0, row, col1, col1+col2, src2);
-			return result;
+			Matrix X = new Matrix(row, col1 + col2);
+			X.setMatrix(0, row, 0, col1, src1);
+			X.setMatrix(0, row, col1, col1 + col2, src2);
+			return X;
 		} else {
-			throw new Exception("row and col should be the same");
+			throw new IllegalArgumentException("row and col should be the same");
 		}
 	}
-	
+
 	/**
 	 * Return the size of elements. m*n.
 	 * 
 	 * @author Steven Chang
 	 */
 	public int size() {
-		return m*n;
+		return m * n;
+	}
+
+	/**
+	 * Realize a simplified version of pdist funciton in MatLab. Can only
+	 * perform Euclidean dist. Dimension one will be the member vector as the
+	 * second dimension will be data vector of each element.
+	 * 
+	 * @return Matrix, a [m(m-1)/2, 1] row vector
+	 * @author Steven Chang
+	 */
+	public Matrix pdist() {
+		
+		// Simplified MatLab version - Euclidean
+		int size = m*n;
+		int tpIndex = 0;
+		Matrix X = new Matrix(size*(size-1)/2, 1);
+		for (int i=0; i<m; ++i) {
+			for (int j=i+1; j<m; ++j, ++tpIndex) {
+				double dist = 0.0;
+				for (int k=0; k<n; ++k) {
+					Maths.hypot(dist, (A[i][k]-A[j][k]));
+				}
+				X.set(tpIndex, 0, dist);
+			}
+		}
+		return X;
+	}
+
+	/**
+	 * Reverse the matrix but not change its size.
+	 * 
+	 * @author Steven Chang
+	 */
+	public Matrix reverse() {
+
+		Matrix X = new Matrix(m, n);
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				X.set(j, i, A[m][n]);
+			}
+		}
+		return X;
+	}
+
+	/**
+	 * Reverse the matrix but not create a new matrix.
+	 * 
+	 * @author Steven Chang
+	 */
+	public void reverseEqual() {
+
+		double tpValue = 0.0;
+		for (int i = 0; i < m; ++i) {
+			for (int j = i; j < n; ++j) {
+				tpValue = A[i][j];
+				A[i][j] = A[j][i];
+				A[j][i] = tpValue;
+			}
+		}
+	}
+
+	/**
+	 * Simplified implementation of MatLab command squareform. Convert a
+	 * distancvector into a square matrix. Data itself should be a vector. Or it
+	 * will throw an exception. Data itself should be a [1, m*(m-1)/2] or
+	 * [m*(m-1)/2, 1] form.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public Matrix squareform() throws Exception {
+
+		if (m != 1 && n != 1) {
+			throw new IllegalArgumentException("Matrix should be a vector.");
+		}
+		int tpVal = (int) Math.sqrt(2 * m * n);
+		if (tpVal * (tpVal + 1) != 2 * m * n) {
+			throw new IllegalArgumentException("Matrix should be a dist vector.");
+		}
+		++tpVal;
+		int tpIndex = 0;
+		Matrix X = new Matrix(tpVal, tpVal, 0.0);
+		if (m == 1) {
+			for (int i = 0; i < tpVal; ++i) {
+				for (int j = i + 1; j < tpVal; ++j, ++tpIndex) {
+					X.set(i, j, A[0][tpIndex]);
+					X.set(j, i, A[0][tpIndex]);
+				}
+			}
+		} else {
+			for (int i = 0; i < tpVal; ++i) {
+				for (int j = i + 1; j < tpVal; ++j, ++tpIndex) {
+					X.set(i, j, A[tpIndex][0]);
+					X.set(j, i, A[tpIndex][0]);
+				}
+			}
+		}
+		return X;
 	}
 
 	/*
