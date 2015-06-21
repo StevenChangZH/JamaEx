@@ -121,6 +121,25 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			}
 		}
 	}
+	
+	/**
+	 * Construct a matrix from a 1-D array. The row dimension will be 1.
+	 * 
+	 * @param A
+	 *            One-dimensional array of doubles.
+	 * @exception IllegalArgumentException
+	 *                All rows must have the same length
+	 * @author Steven Chang
+	 */
+
+	public Matrix(double[] B) {
+		m = 1;
+		n= A.length;
+		A = new double[m][n];
+		for (int i = 0; i < n; ++i) {
+			A[0][i] = B[i];
+		}
+	}
 
 	/**
 	 * Construct a matrix from a 2-D array.
@@ -1491,11 +1510,11 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		if (nrow * ncol >= m * n) {
 			// larger
 			Matrix X = new Matrix(nrow, ncol, fit);
-			for (int i = 0; i < m; ++i) {
-				for (int j = 0; j < n; ++j, ++tpcol) {
-					if (tpcol == ncol) {
-						++tprow;
-						tpcol = 0;
+			for(int j=0; j<n; ++j) {
+				for(int i=0; i<m; ++i, ++tprow) {
+					if (tprow==nrow) {
+						++tpcol;
+						tprow = 0;
 					}
 					X.set(tprow, tpcol, A[i][j]);
 				}
@@ -1503,12 +1522,12 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			return X;
 		} else {
 			// smaller
-			Matrix X = new Matrix(nrow, ncol);
-			for (int i = 0; i < nrow; ++i) {
-				for (int j = 0; j < ncol; ++j, ++tpcol) {
-					if (tpcol == n) {
-						++tprow;
-						tpcol = 0;
+			Matrix X = new Matrix(nrow, ncol, fit);
+			for(int j=0; j<n; ++j) {
+				for(int i=0; i<m; ++i, ++tprow) {
+					if (tprow==nrow) {
+						++tpcol;
+						tprow = 0;
 					}
 					X.set(i, j, A[tprow][tpcol]);
 				}
@@ -1609,10 +1628,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	public Matrix reverse() {
 
 		Matrix X = new Matrix(m, n);
-		for (int i = 0; i < m; ++i) {
-			for (int j = 0; j < n; ++j) {
-				X.set(j, i, A[m][n]);
-			}
+		for(int index=0; index<this.size(); ++index) {
+			X.set(this.size()-index-1, this.get(index));
 		}
 		return X;
 	}
@@ -1624,13 +1641,11 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 */
 	public void reverseEqual() {
 
-		double tpValue = 0.0;
-		for (int i = 0; i < m; ++i) {
-			for (int j = i; j < n; ++j) {
-				tpValue = A[i][j];
-				A[i][j] = A[j][i];
-				A[j][i] = tpValue;
-			}
+		for(int index=0; index<this.size()/2; ++index) {
+			double value = this.get(index);
+			int rindex = this.size()-index-1;
+			this.set(index, this.get(rindex));
+			this.set(rindex, value);
 		}
 	}
 
@@ -1725,6 +1740,70 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		}
 		return X;
 	}
+	
+	/**
+	 * Find the first element matching the value, and return its index.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public int find_first(double value) throws Exception {
+		int count = this.size();
+		for(int i=0; i<count; ++i) {
+			if (this.get(i)==value) {
+				return i;
+			}
+		}
+		return count;
+	}
+	
+	/**
+	 * Find the first row matching the value, and return its row index.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public int find_first_row(Matrix row) throws Exception {
+		
+		if (row.getRowDimension()!=1) {
+			throw new IllegalArgumentException("argument must be a row vector");
+		} else if (row.getColumnDimension()!=n) {
+			throw new IllegalArgumentException("the argument must have the same columns number");
+		}
+		for(int i=0; i<m; ++i) {
+			int j=0;
+			for (j=0; j<n; ++j) {
+				if (A[i][j]!=row.get(j)) break;
+			}
+			if (j==n) {
+				// Find
+				return i;
+			}
+		}
+		return this.getRowDimension();
+	}
+	
+	/**
+	 * Compare with another matrix if every element is the same.
+	 * 
+	 * @param mat
+	 * 			  matrix to compare
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public boolean equals(Matrix mat) throws Exception {
+
+		checkMatrixDimensions(mat);
+		double[][] B = mat.getArray();
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (A[i][j] != B[i][j]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Check each element if equals to a double value. return a matrix with 1
@@ -1773,7 +1852,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @author Steven Chang
 	 * @throws Exception
 	 */
-	public int find_Number(double value) throws Exception {
+	public int find_number(double value) throws Exception {
 
 		int count = 0;
 		for (int i = 0; i < m; ++i) {
@@ -1808,7 +1887,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 *            Row index. Start from 0.
 	 * @param val
 	 *            Value
-	 * @return A(i,j)
 	 * @author Steven Chang
 	 */
 
@@ -1817,13 +1895,24 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		int col = index / m;
 		A[row][col] = val;
 	}
+	
+	/**
+	 * Sort all elements in the matrix.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception 
+	 */
+
+	public Matrix sort() throws Exception {
+
+		return sort(1);
+	}
 
 	/**
 	 * Sort the matrix by specified dimension.
 	 * 
 	 * @param dim
 	 *            Specified dimension to perform sort method
-	 * @return A(i,j)
 	 * @author Steven Chang
 	 */
 
@@ -1842,72 +1931,270 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		for (int i = 0; i < m; ++i) {
 			quicksort(0, n - 1, A[i]);
 		}
-		if (dim==2) {
+		if (dim == 2) {
 			X = X.transpose();
 		}
 		return X;
 	}
 	
 	/**
+	 * Construct a matrix containing elements from index istart to iend(not included)
+	 * 
+	 * @param istart
+	 *            Start of the copied array index.
+	 * @param iend
+	 * 			  End of the copied array index. Not included.
+	 * @return X
+	 * 			  A matrix with size (iend - istart) * 1
+	 * @author Steven Chang
+	 */
+
+	public Matrix getMatrix(int istart, int iend) throws Exception {
+
+		Matrix X = new Matrix((iend-istart), 1);
+		for(int i=istart; i<iend; ++i) {
+			X.set(i, this.get(i));
+		}
+		return X;
+	}
+
+	/**
 	 * Construct a matrix containing elements mat pointed at in A.
 	 * 
 	 * @param dim
 	 *            Specified dimension to perform sort method
-	 * @return A(i,j)
 	 * @author Steven Chang
 	 */
 
-	public Matrix getMatrix(Matrix mat) throws Exception{
+	public Matrix getMatrix(Matrix mat) throws Exception {
 
 		Matrix X = Matrix.constructWithCopy(mat.getArray());
-		for(int i=0; i<mat.getRowDimension(); ++i) {
-			for (int j=0; j<mat.getColumnDimension(); ++j) {
-				double value = this.get((int)mat.get(i, j));
+		for (int i = 0; i < mat.getRowDimension(); ++i) {
+			for (int j = 0; j < mat.getColumnDimension(); ++j) {
+				double value = this.get((int) mat.get(i, j));
 				X.set(i, j, value);
 			}
 		}
-		
+
 		return X;
 	}
-	
+
 	/**
 	 * Get a matrix containing rows that mat pointed at in A.
 	 * 
 	 * @param dim
 	 *            row index storage matrix
-	 * @return A(i,j)
 	 * @author Steven Chang
 	 */
 
-	public Matrix getRows(Matrix mat) throws Exception{
+	public Matrix getRows(Matrix mat) throws Exception {
 
 		Matrix X = new Matrix(mat.size(), n);
-		for(int i=0; i<mat.size(); ++i) {
-			for (int j=0; j<n; ++j) {
-				double value = this.get((int)mat.get(i), j);
+		for (int i = 0; i < mat.size(); ++i) {
+			for (int j = 0; j < n; ++j) {
+				double value = this.get((int) mat.get(i), j);
 				X.set(i, j, value);
 			}
 		}
 		return X;
 	}
-	
+
 	/**
 	 * GGet a matrix containing rows that mat pointed at in A.
 	 * 
 	 * @param mat
 	 *            col index storage matrix
-	 * @return A(i,j)
 	 * @author Steven Chang
 	 */
 
-	public Matrix getCols(Matrix mat) throws Exception{
+	public Matrix getCols(Matrix mat) throws Exception {
 
 		Matrix X = new Matrix(mat.size(), n);
-		for(int i=0; i<mat.size(); ++i) {
-			for (int j=0; j<m; ++j) {
-				double value = this.get(j, (int)mat.get(i));
+		for (int i = 0; i < mat.size(); ++i) {
+			for (int j = 0; j < m; ++j) {
+				double value = this.get(j, (int) mat.get(i));
 				X.set(j, i, value);
 			}
+		}
+		return X;
+	}
+
+	/**
+	 * Perform abs() method for all elements in the matrix.
+	 * 
+	 * @author Steven Chang
+	 */
+
+	public Matrix abs() throws Exception {
+
+		double[][] B = new double[m][n];
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < m; ++j) {
+				if (A[i][j] < 0)
+					B[i][j] = -A[i][j];
+				else
+					B[i][j] = A[i][j];
+			}
+		}
+		return new Matrix(B);
+	}
+
+	/**
+	 * get the sum of all elements.
+	 * 
+	 * @author Steven Chang
+	 */
+
+	public double sum() throws Exception {
+
+		double val = 0.0;
+		for(int i=0; i<m; ++i) {
+			for(int j=0; j<n; ++j) {
+				val += A[i][j];
+			}
+		}
+		return val/this.size();
+	}
+
+	/**
+	 * get the sum of assigned dimensions.
+	 * 
+	 * @param dim
+	 *            dim=1: row dim=2: col
+	 * 
+	 * @author Steven Chang
+	 */
+
+	public Matrix sum(int dim) throws Exception {
+
+		if (dim == 1) {
+			// row
+			Matrix X = new Matrix(m, 1);
+			double[][] arr = X.getArray();
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < n; ++j) {
+					arr[i][0] += A[i][j] / n;
+				}
+			}
+			return X;
+		} else if (dim == 2) {
+			// col
+			Matrix X = new Matrix(1, n);
+			double[][] arr = X.getArray();
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < n; ++j) {
+					arr[0][j] += A[i][j] / m;
+				}
+			}
+			return X;
+		} else  {
+			throw new IllegalArgumentException("dim must be 1 or 2");
+		}
+	}
+	
+	/**
+	 * Fill the elements given by arguments. It will create an array from 
+	 * start to end(including end) with the size of m*n, and fill each elements
+	 * into A.
+	 * 
+	 * @param start
+	 * 			  start of the array
+	 * @param end
+	 * 			  end of the array
+	 * @author Steven Chang
+	 */
+
+	public void fill(double start, double end) throws Exception {
+			
+		double stride = (end-start)/(this.size()-1);
+		double val = start;
+		for(int j=0; j<n; ++j){ 
+			for(int i=0; i<m; ++i){
+				A[i][j] = val;
+				val += stride;
+			}
+		}
+	}
+	
+	/**
+	 * Simplified version of setdiff method in MatLab.
+	 * Find
+	 * 
+	 * @param mat
+	 * 			  Another matrix to compare.
+	 * @return X
+	 * 			  Index of different elements in both matrices.
+	 * @author Steven Chang
+	 */
+
+	public Matrix setdiff(Matrix mat) throws Exception {
+		
+		checkMatrixDimensions(mat);
+		double[] arr = new double[m*n];
+		int numOfDiff = 0;
+		for(int i=0; i<m*n; ++i) {
+			if (this.get(i)!=mat.get(i)) {
+				arr[numOfDiff] = i;
+				++numOfDiff;
+			}
+		}
+		// Copy and construct
+		Matrix X = new Matrix(numOfDiff, 1);
+		for(int i=0; i<numOfDiff; ++i) {
+			X.set(i, 0, arr[i]);
+		}
+		return X;
+	}
+	
+	/**
+	 * Create a matrix, containing indices of elements from this to mat by specified
+	 * dimension. Size of two matrices must match. Also for each row/column, the set 
+	 * of elements must be the same. 
+	 * 
+	 * @param mat
+	 * 			  Another matrix to compare.
+	 * @param dim
+	 * 			  Specified dimension
+	 * @return X
+	 * 			  this->mat
+	 * @author Steven Chang
+	 */
+
+	public Matrix buildBind(Matrix mat, int dim) throws Exception {
+		
+		checkMatrixDimensions(mat);
+		Matrix X = this.copy();
+		double[][] arr = X.getArray();
+		if (dim==1) {
+			// row dimension
+			for(int i=0; i<m; ++i) {
+				for(int j=0; j<n; ++j) {
+					int k=0;
+					for(; k<n; ++k) {
+						if (A[i][j] == mat.get(i, k)) break;
+					}
+					if (k==n) {
+						throw new IllegalArgumentException("Data set of each row must be the same");
+					}
+					arr[i][j] = k;
+				}
+			}
+		} else if (dim==2) {
+			// column dimension
+			for(int j=0; j<n; ++j) {
+				for(int i=0; i<m; ++i) {
+					int k=0;
+					for(; k<n; ++k) {
+						if (A[i][j] == mat.get(i, k)) break;
+					}
+					if (k==n) {
+						throw new IllegalArgumentException("Data set of each row must be the same");
+					}
+					arr[i][j] = k;
+				}
+			}
+		} else {
+			throw new IllegalArgumentException("dim must be 1 or 2");
 		}
 		return X;
 	}
