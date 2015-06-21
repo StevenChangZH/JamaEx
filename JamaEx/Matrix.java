@@ -91,7 +91,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @param m
 	 *            Number of rows.
 	 * @param n
-	 *            Number of colums.
+	 *            Number of columns.
 	 */
 
 	public Matrix(int m, int n) {
@@ -106,7 +106,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @param m
 	 *            Number of rows.
 	 * @param n
-	 *            Number of colums.
+	 *            Number of columns.
 	 * @param s
 	 *            Fill the matrix with this scalar value.
 	 */
@@ -152,7 +152,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @param m
 	 *            Number of rows.
 	 * @param n
-	 *            Number of colums.
+	 *            Number of columns.
 	 */
 
 	public Matrix(double[][] A, int m, int n) {
@@ -1299,18 +1299,18 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			throw new IllegalArgumentException("row and col should be the same");
 		}
 	}
-	
+
 	/**
 	 * Return the max value of matrix data.
 	 * 
 	 * @author Steven Chang
 	 */
 	public double max() {
-		
+
 		double max = A[0][0];
-		for (int i=0; i<m; ++i) {
-			for(int j=0; j<n; ++j) {
-				if (max<A[i][j]) {
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (max < A[i][j]) {
 					max = A[i][j];
 				}
 			}
@@ -1359,18 +1359,18 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			throw new IllegalArgumentException("row and col should be the same");
 		}
 	}
-	
+
 	/**
 	 * Return the min value of matrix data.
 	 * 
 	 * @author Steven Chang
 	 */
 	public double min() {
-		
+
 		double min = A[0][0];
-		for (int i=0; i<m; ++i) {
-			for(int j=0; j<n; ++j) {
-				if (min>A[i][j]) {
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (min > A[i][j]) {
 					min = A[i][j];
 				}
 			}
@@ -1433,7 +1433,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
 		// MatLab repmat simplified function
 		if (r1 < 1 || r2 < 1) {
-			throw new IllegalArgumentException("r1 and r2 should be larger than 0");
+			throw new IllegalArgumentException(
+					"r1 and r2 should be larger than 0");
 		}
 		int nrow = m * r1;
 		int ncol = n * r2;
@@ -1460,16 +1461,36 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @author Steven Chang
 	 */
 	public Matrix reshape(int nrow, int ncol) throws Exception {
+		return reshape(nrow, ncol, 0.0);
+	}
+
+	/**
+	 * Realize the simplified version of reshape like MatLab. It will reshape
+	 * the matrix with given size. If the size is smaller than before, data at
+	 * the end will be lost. If the size is larger, duplicate the former data
+	 * and add 0 to fill the matrix. Throw exception if nrow or ncol less than
+	 * 1.
+	 * 
+	 * @param nrow
+	 *            new row number of reshaped matrix
+	 * @param ncol
+	 *            new col number of reshaped matrix
+	 * @param fit
+	 *            fit is used to initialize those elements without covered.
+	 * @author Steven Chang
+	 */
+	public Matrix reshape(int nrow, int ncol, double fit) throws Exception {
 
 		// Simplified version of reshape method
 		if (nrow < 1 || ncol < 1) {
-			throw new IllegalArgumentException("nrow and ncol should be larger than 0");
+			throw new IllegalArgumentException(
+					"nrow and ncol should be larger than 0");
 		}
 		int tprow = 0;
 		int tpcol = 0;
 		if (nrow * ncol >= m * n) {
 			// larger
-			Matrix X = new Matrix(nrow, ncol, 0.0);
+			Matrix X = new Matrix(nrow, ncol, fit);
 			for (int i = 0; i < m; ++i) {
 				for (int j = 0; j < n; ++j, ++tpcol) {
 					if (tpcol == ncol) {
@@ -1517,7 +1538,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		if (dim == 1) {
 			// [src1, src2]
 			if (src1.getColumnDimension() != src2.getColumnDimension()) {
-				throw new IllegalArgumentException("Number of col must be equal");
+				throw new IllegalArgumentException(
+						"Number of col must be equal");
 			}
 			int row1 = src1.getRowDimension();
 			int row2 = src2.getRowDimension();
@@ -1529,7 +1551,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		} else if (dim == 2) {
 			// [src1;src2]
 			if (src1.getRowDimension() != src2.getRowDimension()) {
-				throw new IllegalArgumentException("Number of rows must be equal");
+				throw new IllegalArgumentException(
+						"Number of rows must be equal");
 			}
 			int row = src1.getRowDimension();
 			int col1 = src1.getColumnDimension();
@@ -1561,16 +1584,16 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	 * @author Steven Chang
 	 */
 	public Matrix pdist() {
-		
+
 		// Simplified MatLab version - Euclidean
-		int size = m*n;
+		int size = m * n;
 		int tpIndex = 0;
-		Matrix X = new Matrix(size*(size-1)/2, 1);
-		for (int i=0; i<m; ++i) {
-			for (int j=i+1; j<m; ++j, ++tpIndex) {
+		Matrix X = new Matrix(size * (size - 1) / 2, 1);
+		for (int i = 0; i < m; ++i) {
+			for (int j = i + 1; j < m; ++j, ++tpIndex) {
 				double dist = 0.0;
-				for (int k=0; k<n; ++k) {
-					Maths.hypot(dist, (A[i][k]-A[j][k]));
+				for (int k = 0; k < n; ++k) {
+					Maths.hypot(dist, (A[i][k] - A[j][k]));
 				}
 				X.set(tpIndex, 0, dist);
 			}
@@ -1627,7 +1650,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		}
 		int tpVal = (int) Math.sqrt(2 * m * n);
 		if (tpVal * (tpVal + 1) != 2 * m * n) {
-			throw new IllegalArgumentException("Matrix should be a dist vector.");
+			throw new IllegalArgumentException(
+					"Matrix should be a dist vector.");
 		}
 		++tpVal;
 		int tpIndex = 0;
@@ -1650,9 +1674,272 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		return X;
 	}
 
+	/**
+	 * Get one row.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public Matrix getRow(int index) throws Exception {
+		return this.getMatrix(index, index + 1, 0, getColumnDimension());
+	}
+
+	/**
+	 * Get one col.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public Matrix getCol(int index) throws Exception {
+		return this.getMatrix(0, getRowDimension(), index, index + 1);
+	}
+
+	/**
+	 * Return a 1 x n matrix containing the number of indices of element
+	 * matching the value.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public Matrix find(double value) throws Exception {
+
+		int count = 0;
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (A[i][j] == value) {
+					++count;
+				}
+			}
+		}
+		// Assign the index
+		Matrix X = new Matrix(1, count);
+		int tpCount = 0;
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (A[i][j] == value) {
+					++count;
+					X.set(0, tpCount, i * m + j);
+					++tpCount;
+				}
+			}
+		}
+		return X;
+	}
+
+	/**
+	 * Check each element if equals to a double value. return a matrix with 1
+	 * and 0.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public Matrix equals(double value) throws Exception {
+
+		Matrix X = new Matrix(m, n, 0.0);
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (A[i][j] == value) {
+					X.set(i, j, 1.0);
+				}
+			}
+		}
+		return X;
+	}
+
+	/**
+	 * Check each element if equals to a double value. change the value to
+	 * substitute.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public Matrix equalsSubstitute(double value, double substitute)
+			throws Exception {
+
+		Matrix X = new Matrix(m, n, 0.0);
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (A[i][j] == value) {
+					X.set(i, j, substitute);
+				}
+			}
+		}
+		return X;
+	}
+
+	/**
+	 * Find the number of elements matching the value.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public int find_Number(double value) throws Exception {
+
+		int count = 0;
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (A[i][j] == value) {
+					++count;
+				}
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * Get a single element from the index. Search order: m-n
+	 * 
+	 * @param index
+	 *            Row index. Start from 0.
+	 * @return A(i,j)
+	 * @author Steven Chang
+	 */
+
+	public double get(int index) {
+		int row = index % m;
+		int col = index / m;
+		return A[row][col];
+	}
+
+	/**
+	 * Set a single element from the index. Search order: m-n
+	 * 
+	 * @param index
+	 *            Row index. Start from 0.
+	 * @param val
+	 *            Value
+	 * @return A(i,j)
+	 * @author Steven Chang
+	 */
+
+	public void set(int index, double val) {
+		int row = index % m;
+		int col = index / m;
+		A[row][col] = val;
+	}
+
+	/**
+	 * Sort the matrix by specified dimension.
+	 * 
+	 * @param dim
+	 *            Specified dimension to perform sort method
+	 * @return A(i,j)
+	 * @author Steven Chang
+	 */
+
+	public Matrix sort(int dim) {
+
+		Matrix X = Matrix.constructWithCopy(A);
+		if (dim == 1) {
+			// ok
+		} else if (dim == 2) {
+			// Perform transposition
+			X = X.transpose();
+		} else {
+			throw new IllegalArgumentException("dim must be 1 or 2");
+		}
+		// For each row, perform quick sort
+		for (int i = 0; i < m; ++i) {
+			quicksort(0, n - 1, A[i]);
+		}
+		if (dim==2) {
+			X = X.transpose();
+		}
+		return X;
+	}
+	
+	/**
+	 * Construct a matrix containing elements mat pointed at in A.
+	 * 
+	 * @param dim
+	 *            Specified dimension to perform sort method
+	 * @return A(i,j)
+	 * @author Steven Chang
+	 */
+
+	public Matrix getMatrix(Matrix mat) throws Exception{
+
+		Matrix X = Matrix.constructWithCopy(mat.getArray());
+		for(int i=0; i<mat.getRowDimension(); ++i) {
+			for (int j=0; j<mat.getColumnDimension(); ++j) {
+				double value = this.get((int)mat.get(i, j));
+				X.set(i, j, value);
+			}
+		}
+		
+		return X;
+	}
+	
+	/**
+	 * Get a matrix containing rows that mat pointed at in A.
+	 * 
+	 * @param dim
+	 *            row index storage matrix
+	 * @return A(i,j)
+	 * @author Steven Chang
+	 */
+
+	public Matrix getRows(Matrix mat) throws Exception{
+
+		Matrix X = new Matrix(mat.size(), n);
+		for(int i=0; i<mat.size(); ++i) {
+			for (int j=0; j<n; ++j) {
+				double value = this.get((int)mat.get(i), j);
+				X.set(i, j, value);
+			}
+		}
+		return X;
+	}
+	
+	/**
+	 * GGet a matrix containing rows that mat pointed at in A.
+	 * 
+	 * @param mat
+	 *            col index storage matrix
+	 * @return A(i,j)
+	 * @author Steven Chang
+	 */
+
+	public Matrix getCols(Matrix mat) throws Exception{
+
+		Matrix X = new Matrix(mat.size(), n);
+		for(int i=0; i<mat.size(); ++i) {
+			for (int j=0; j<m; ++j) {
+				double value = this.get(j, (int)mat.get(i));
+				X.set(j, i, value);
+			}
+		}
+		return X;
+	}
+
 	/*
 	 * ------------------------ Private Methods ------------------------
 	 */
+
+	/** Quick sort method **/
+	private void quicksort(int s, int t, double[] a2) {
+		int i = s, j = t;
+		double x = a2[(int) (i + j) / 2], y;
+		do {
+			while (a2[i] < x)
+				i++;
+			while (a2[i] > x)
+				j--;
+			if (i <= j) {
+				y = a2[i];
+				a2[j] = a2[i];
+				a2[i] = y;
+				i++;
+				j--;
+			}
+		} while (i < j);
+		if (j > s) {
+			quicksort(s, j, a2);
+		}
+		if (i < t) {
+			quicksort(i, t, a2);
+		}
+	}
 
 	/** Check if size(A) == size(B) **/
 
