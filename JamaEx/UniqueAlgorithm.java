@@ -73,7 +73,7 @@ public class UniqueAlgorithm implements java.io.Serializable {
 		C = A.sort();
 		int num = 1;
 		double currVal = A.get(0);
-		for(int i=1; i<C.size(); ++i) {
+		for(int i=1; i<C.elementSize(); ++i) {
 			if(currVal != C.get(i)) {
 				currVal = C.get(i);
 				C.set(num, currVal);
@@ -83,14 +83,14 @@ public class UniqueAlgorithm implements java.io.Serializable {
 		// Get C
 		C = C.getMatrix(0, num);
 		// Get ia
-		ia = new Matrix(C.size(), 1);
-		for(int i=0; i<C.size(); ++i) {
+		ia = new Matrix(C.elementSize(), 1);
+		for(int i=0; i<C.elementSize(); ++i) {
 			int index = A.find_first(C.get(i));
 			ia.set(i, 0, index);
 		}
 		// Get ic
 		ic = A.copy();
-		for(int i=0; i<C.size(); ++i) {
+		for(int i=0; i<C.elementSize(); ++i) {
 			ic = ic.equalsSubstitute(C.get(i), i);
 		}
 	}

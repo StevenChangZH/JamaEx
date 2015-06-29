@@ -6,52 +6,55 @@ Notice the order of index in Matrix class follows as how MatLab does. That is, m
 My advice: use it as MatLab. Do not raise high expectations on performance.
 
 ## Extensions
-Extension for Matrix class:
+Extensions for Matrix class:
 
 Add methods:
 
 ```
-public Matrix(double[] B);
+Matrix(double[] B);
 
-public Matrix abs() throws Exception;
-public Matrix buildBind(Matrix mat, int dim) throws Exception;
-public static Matrix concatenate(Matrix src1, Matrix src2, int dim) throws Exception;
-public Matrix equals(double value) throws Exception;
-public boolean equals(Matrix mat) throws Exception;
-public Matrix equalsSustitute(double value, double substitute) throws Exception;
-public void fill(double start, double end) throws Exception;
-public Matrix find(double value) throws Exception;
-public int find_first(double value) throws Exception;
-public int find_number(double value) throws Exception;
-public double get(int index);
-public Matrix getCol(int index) throws Exception;
-public Matrix getCols(Matrix mat) throws Exception;
-public Matrix getMatrix(int istart, int iend) throws Exception;
-public Matrix getMatrix(Matrix mat) throws Exception;
-public Matrix getRow(int index) throws Exception;
-public Matrix getRows(Matrix mat) throws Exception;
-public Matrix max(int dim) throws Exception;
-public Matrix max();
-public Matrix mean(int dim) throws Exception;
-public Matrix min(int dim) throws Exception;
-public Matrix min();
-public Matrix repmat(int r1, int r2) throws Exception;
-public Matrix reshape(int nrow, int ncol) throws Exception;
-public Matrix reverse();
-public void reverseEqual();
-public Matrix pdist(Matrix matrix);
-public void set(int index, double val);
-public Matrix setdiff(Matrix mat) throws Exception;
-public int size();
-public Matrix sort() throws Exception;
-public Matrix sort(int dim);
-public Matrix squareform() throws Exception;
-public double sum() throws Exception;
-public Matrix sum(int dim) throws Exception;
+Matrix abs();
+Matrix buildBind(Matrix mat, int dim);
+static Matrix concatenate(Matrix src1, Matrix src2, int dim);
+int elementSize();
+Matrix equals(double value);
+boolean equals(Matrix mat);
+Matrix equalsSustitute(double value, double substitute);
+void fill(double start, double end);
+Matrix find(double value);
+int find_first(double value);
+int find_first_row(Matrix row);
+int find_number(double value);
+double get(int index);
+Matrix getCol(int index);
+Matrix getCols(Matrix mat);
+Matrix getMatrix(int istart, int iend);
+Matrix getMatrix(Matrix mat);
+Matrix getRow(int index);
+Matrix getRows(Matrix mat);
+Matrix max(int dim);
+double max();
+Matrix mean(int dim);
+double mean();
+Matrix min(int dim);
+double min();
+Matrix repmat(int r1, int r2);
+Matrix reshape(int nrow, int ncol);
+Matrix reshape(int nrow, int ncol, double fit);
+Matrix reverse();
+void reverseEqual();
+Matrix pdist(Matrix matrix);
+void set(int index, double val);
+Matrix setdiff(Matrix mat);
+Matrix sort();
+Matrix sort(int dim);
+Matrix squareform();
+double sum();
+Matrix sum(int dim);
 
 private void quicksort(int s, int t, double[] a2);
 ```
 
 Add another class called Matrix3. More methods will be updated later.
 
-Not tested yet. Later I'll add test codes.
+Tests do not cover all for now. Later I'll add test codes.
