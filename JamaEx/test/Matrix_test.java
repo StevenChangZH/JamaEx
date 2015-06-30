@@ -1082,38 +1082,19 @@ public class Matrix_test {
 					"incorrect construction");
 		}
 		/**
-		 * Test methods: abs() 
-		 * buildBind(Matrix mat, int dim) 
-		 * concatenate(Matrix src1, Matrix src2, int dim) 
-		 * elementSize()
-		 * equals(double value) 
-		 * equals(Matrix mat) 
-		 * equalsSustitute(double value,
-		 * double substitute) 
-		 * get(int index) 
-		 * fill(double start, double end)
-		 * find_number(double value) 
-		 * find(double value) 
-		 * find_first(double value)
-		 * find_first_row(Matrix row) 
-		 * getCol(int index) 
-		 * getCols(Matrix mat)
-		 * set(int index, double val) 
-		 * getMatrix(int istart, int iend)
-		 * getMatrix(Matrix mat) 
-		 * getRow(int index) 
-		 * getRows(Matrix mat) 
-		 * max(int dim) 
-		 * max() 
-		 * mean(int dim) 
-		 * mean() 
-		 * min(int dim) 
-		 * min()
-		 * repmat(int r1, int r2)
-		 * reshape(int nrow, int ncol)
-		 * reshape(int nrow, int ncol, double fit)
-		 * reverse()
-		 * reverseEqual()
+		 * Test methods: abs() buildBind(Matrix mat, int dim) concatenate(Matrix
+		 * src1, Matrix src2, int dim) elementSize() equals(double value)
+		 * equals(Matrix mat) equalsSustitute(double value, double substitute)
+		 * get(int index) fill(double start, double end) find_number(double
+		 * value) find(double value) find_first(double value)
+		 * find_first_row(Matrix row) find_first_col(Matrix row) getCol(int
+		 * index) getCols(Matrix mat) set(int index, double val) getMatrix(int
+		 * istart, int iend) getMatrix(Matrix mat) getRow(int index)
+		 * getRows(Matrix mat) max(int dim) max() mean(int dim) mean() min(int
+		 * dim) min() repmat(int r1, int r2) reshape(int nrow, int ncol)
+		 * reshape(int nrow, int ncol, double fit) reverse() reverseEqual()
+		 * pdist(Matrix matrix) set(int index, double val) sort() sort(int dim)
+		 * setdiff(Matrix mat) squareform() sum() sum(int dim)
 		 **/
 		try {
 			Matrix mixedValCopy = Matrix.constructWithCopy(mixedVal);
@@ -1342,6 +1323,22 @@ public class Matrix_test {
 					"find_first_row(Matrix row)...", "processing error");
 		}
 		try {
+			Matrix cmixedvalcopy = Matrix.constructWithCopy(colMixedVal);
+			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
+			double[][] colarray = { { 2. }, { -4. }, { -2.2 } };
+			Matrix colmat = new Matrix(colarray);
+			int firstindex1 = mixedvalcopy.find_first_col(colmat);
+			int firstindex2 = cmixedvalcopy.find_first_col(colmat);
+
+			if (firstindex1 != -1 || firstindex2 != 1) {
+				throw new Exception();
+			}
+			try_success("find_first_col(Matrix col)...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount,
+					"find_first_col(Matrix col)...", "processing error");
+		}
+		try {
 			double[][] colarray = { { -3 }, { 3.3 }, { 1.2 } };
 			Matrix colmat = new Matrix(colarray);
 			Matrix colgetmat = Matrix.constructWithCopy(mixedVal).getCol(0);
@@ -1462,7 +1459,7 @@ public class Matrix_test {
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
 			double[][] meanrowarr = { { -1.025 }, { -0.125 }, { -0.95 } };
-			double[][] meancolarr = { { 0.5, -1.4, -1.7/3., -4./3. } };
+			double[][] meancolarr = { { 0.5, -1.4, -1.7 / 3., -4. / 3. } };
 			Matrix meanrowmat = new Matrix(meanrowarr);
 			Matrix meancolmat = new Matrix(meancolarr);
 			if (!meanrowmat.equals(mixedvalcopy.mean(2))
@@ -1481,7 +1478,8 @@ public class Matrix_test {
 			}
 			try_success("mean()...", "");
 		} catch (Exception e) {
-			errorCount = try_failure(errorCount, "mean()...", "processing error");
+			errorCount = try_failure(errorCount, "mean()...",
+					"processing error");
 		}
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
@@ -1510,92 +1508,243 @@ public class Matrix_test {
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
 			Matrix repmatmixed = mixedvalcopy.repmat(1, 2);
-			if (repmatmixed.getRowDimension()!=mixedvalcopy.getRowDimension()
-					||repmatmixed.getColumnDimension()!=mixedvalcopy.getColumnDimension()*2) {
+			if (repmatmixed.getRowDimension() != mixedvalcopy.getRowDimension()
+					|| repmatmixed.getColumnDimension() != mixedvalcopy
+							.getColumnDimension() * 2) {
 				throw new Exception();
 			}
-			for (int i=0; i<mixedvalcopy.getRowDimension(); ++i) {
-				for (int j=0; j<mixedvalcopy.getColumnDimension(); ++j) {
-					if (mixedvalcopy.get(i,j)!=repmatmixed.get(i,j)) {
+			for (int i = 0; i < mixedvalcopy.getRowDimension(); ++i) {
+				for (int j = 0; j < mixedvalcopy.getColumnDimension(); ++j) {
+					if (mixedvalcopy.get(i, j) != repmatmixed.get(i, j)) {
 						throw new Exception();
 					}
 				}
 			}
-			for (int i=0; i<mixedvalcopy.getRowDimension(); ++i) {
-				for (int j=0; j<mixedvalcopy.getColumnDimension(); ++j) {
-					if (mixedvalcopy.get(i,j)!=repmatmixed.get(i,j+mixedvalcopy.getColumnDimension())) {
+			for (int i = 0; i < mixedvalcopy.getRowDimension(); ++i) {
+				for (int j = 0; j < mixedvalcopy.getColumnDimension(); ++j) {
+					if (mixedvalcopy.get(i, j) != repmatmixed.get(i, j
+							+ mixedvalcopy.getColumnDimension())) {
 						throw new Exception();
 					}
 				}
 			}
 			try_success("repmat(int r1, int r2)...", "");
 		} catch (Exception e) {
-			errorCount = try_failure(errorCount, "repmat(int r1, int r2)...", "processing error");
+			errorCount = try_failure(errorCount, "repmat(int r1, int r2)...",
+					"processing error");
 		}
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
 			Matrix resizemixed = mixedvalcopy.reshape(4, 3);
-			for(int i=0; i<mixedvalcopy.elementSize(); ++i) {
-				if (mixedvalcopy.get(i)!=resizemixed.get(i)) {
+			for (int i = 0; i < mixedvalcopy.elementSize(); ++i) {
+				if (mixedvalcopy.get(i) != resizemixed.get(i)) {
 					throw new Exception();
 				}
 			}
 			try_success("reshape(int nrow, int ncol)...", "");
 		} catch (Exception e) {
-			errorCount = try_failure(errorCount, "reshape(int nrow, int ncol)...", "processing error");
+			errorCount = try_failure(errorCount,
+					"reshape(int nrow, int ncol)...", "processing error");
 		}
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
 			Matrix resizemixed = mixedvalcopy.reshape(2, 2, 1.0);
-			for(int i=0; i<4; ++i) {
-				if (mixedvalcopy.get(i)!=resizemixed.get(i)) {
+			for (int i = 0; i < 4; ++i) {
+				if (mixedvalcopy.get(i) != resizemixed.get(i)) {
 					throw new Exception();
 				}
 			}
 			resizemixed = mixedvalcopy.reshape(4, 4, 555.0);
-			for(int i=0; i<mixedvalcopy.elementSize(); ++i) {
-				if (mixedvalcopy.get(i)!=resizemixed.get(i)) {
+			for (int i = 0; i < mixedvalcopy.elementSize(); ++i) {
+				if (mixedvalcopy.get(i) != resizemixed.get(i)) {
 					throw new Exception();
 				}
 			}
-			for (int i=mixedvalcopy.elementSize(); i<16; ++i) {
-				if (resizemixed.get(i)!=555.0) {
+			for (int i = mixedvalcopy.elementSize(); i < 16; ++i) {
+				if (resizemixed.get(i) != 555.0) {
 					throw new Exception();
 				}
 			}
 			try_success("reshape(int nrow, int ncol, double fit)...", "");
 		} catch (Exception e) {
-			errorCount = try_failure(errorCount, "reshape(int nrow, int ncol, double fit)...", "processing error");
+			errorCount = try_failure(errorCount,
+					"reshape(int nrow, int ncol, double fit)...",
+					"processing error");
 		}
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
 			Matrix reversemixed = mixedvalcopy.reverse();
 			int size = mixedvalcopy.elementSize();
-			for(int i=0; i<mixedvalcopy.elementSize(); ++i) {
-				if (mixedvalcopy.get(i)!=reversemixed.get(size-i-1)) {
+			for (int i = 0; i < mixedvalcopy.elementSize(); ++i) {
+				if (mixedvalcopy.get(i) != reversemixed.get(size - i - 1)) {
 					throw new Exception();
 				}
 			}
 			try_success("reverse()...", "");
 		} catch (Exception e) {
-			errorCount = try_failure(errorCount, "reverse()...", "processing error");
+			errorCount = try_failure(errorCount, "reverse()...",
+					"processing error");
 		}
 		try {
 			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
 			Matrix reversemixed = mixedvalcopy.copy();
 			reversemixed.reverseEqual();
 			int size = mixedvalcopy.elementSize();
-			for(int i=0; i<mixedvalcopy.elementSize(); ++i) {
-				if (mixedvalcopy.get(i)!=reversemixed.get(size-i-1)) {
+			for (int i = 0; i < mixedvalcopy.elementSize(); ++i) {
+				if (mixedvalcopy.get(i) != reversemixed.get(size - i - 1)) {
 					throw new Exception();
 				}
 			}
 			try_success("reverseEqual()...", "");
 		} catch (Exception e) {
-			errorCount = try_failure(errorCount, "reverseEqual()...", "processing error");
+			errorCount = try_failure(errorCount, "reverseEqual()...",
+					"processing error");
 		}
-		
-		
+		try {
+			double[][] dataset = { { 1., 0., 0., 0. }, { 0., 1., 0., 0. },
+					{ 0., 0., 1., 0. }, { .0, 0., 0., 1. } };
+			Matrix data = new Matrix(dataset);
+			Matrix datadist = data.pdist();
+			Matrix distmat = new Matrix(6, 1, Math.sqrt(2.));
+			if (!datadist.equals(distmat)) {
+				throw new Exception();
+			}
+			try_success("pdist()...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "pdist()...",
+					"processing error");
+		}
+		try {
+			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
+			Matrix sortmixed = mixedvalcopy.sort();
+			if (sortmixed.getRowDimension() != mixedvalcopy.getRowDimension()
+					|| sortmixed.getColumnDimension() != mixedvalcopy
+							.getColumnDimension()) {
+				throw new Exception();
+			}
+			double val = sortmixed.get(0);
+			for (int i = 0; i < sortmixed.elementSize(); ++i) {
+				if (val > sortmixed.get(i)) {
+					throw new Exception();
+				}
+				val = sortmixed.get(i);
+			}
+			try_success("sort()...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "sort()...",
+					"processing error");
+		}
+		try {
+			Matrix mixedvalcopy = Matrix.constructWithCopy(mixedVal);
+			Matrix rowsortmixed = mixedvalcopy.sort(1);
+			Matrix colsortmixed = mixedvalcopy.sort(2);
+			if (rowsortmixed.getRowDimension() != mixedvalcopy
+					.getRowDimension()
+					|| rowsortmixed.getColumnDimension() != mixedvalcopy
+							.getColumnDimension()) {
+				throw new Exception();
+			}
+			for (int i = 0; i < rowsortmixed.getRowDimension(); ++i) {
+				double val = rowsortmixed.get(i, 0);
+				for (int j = 1; j < rowsortmixed.getColumnDimension(); ++j) {
+					if (val > rowsortmixed.get(i, j)) {
+						throw new Exception();
+					}
+					val = rowsortmixed.get(i, j);
+				}
+			}
+			if (colsortmixed.getRowDimension() != mixedvalcopy
+					.getRowDimension()
+					|| colsortmixed.getColumnDimension() != mixedvalcopy
+							.getColumnDimension()) {
+				throw new Exception();
+			}
+			for (int j = 0; j < colsortmixed.getColumnDimension(); ++j) {
+				double val = colsortmixed.get(0, j);
+				for (int i = 1; i < colsortmixed.getRowDimension(); ++i) {
+					if (val > colsortmixed.get(i, j)) {
+						throw new Exception();
+					}
+					val = colsortmixed.get(i, j);
+				}
+			}
+			try_success("sort(int dim)...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "sort(int dim)...",
+					"processing error");
+		}
+		try {
+			double[][] dataset = { { 1., 0., 0., 0. }, { 0., 1., 0., 0. },
+					{ 0., 0., 1., 0. }, { .0, 0., 0., 1. } };
+			Matrix datamat = new Matrix(dataset);
+			double[][] dataset2 = { { 0., 1., 0., 0. }, { 1., 0., 0., 0. },
+					{ .0, 0., 0., 1. }, { 0., 0., 1., 0. } };
+			Matrix datamat2 = new Matrix(dataset2);
+			double[][] diff = { { 0 }, { 1 }, { 4 }, { 5 }, { 10 }, { 11 },
+					{ 14 }, { 15 } };
+			Matrix diffmat = new Matrix(diff);
+			Matrix caldiff = datamat.setdiff(datamat2);
+			if (!caldiff.equals(diffmat)) {
+				throw new Exception();
+			}
+			try_success("setdiff(Matrix mat)...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "setdiff(Matrix mat)...",
+					"processing error");
+		}
+		try {
+			double[][] dist = { { 1.2, 2.3, 3.4 } };
+			Matrix distmat = new Matrix(dist);
+			Matrix squaredistmat = distmat.squareform();
+			for (int i = 0; i < 3; ++i) {
+				if (squaredistmat.get(i, i) != 0.0) {
+					throw new Exception();
+				}
+			}
+			if (!squaredistmat.equals(squaredistmat.transpose())) {
+				throw new Exception();
+			}
+			if (squaredistmat.get(1, 0) != 1.2
+					|| squaredistmat.get(2, 0) != 2.3
+					|| squaredistmat.get(2, 1) != 3.4) {
+				throw new Exception();
+			}
+			try_success("squareform()...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "squareform()...",
+					"processing error");
+		}
+		try {
+			double[][] dataset = { { 1., 0., 0., 0. }, { 0., 1., 0., 0. },
+					{ 0., 0., 1., 0. }, { .0, 0., 0., 1. } };
+			Matrix datamat = new Matrix(dataset);
+			double[][] sum = { { 1, 1, 1, 1 } };
+			Matrix summat = new Matrix(sum);
+			Matrix rowsummat = datamat.sum(1);
+			Matrix colsummat = datamat.sum(2);
+			if (!rowsummat.equals(summat.transpose())) {
+				throw new Exception();
+			}
+			if (!colsummat.equals(summat)) {
+				throw new Exception();
+			}
+			try_success("sum(int dim)...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "sum(int dim)...",
+					"processing error");
+		}
+		try {
+			double[][] dataset = { { 1., 0., 0., 0. }, { 0., 1., 0., 0. },
+					{ 0., 0., 1., 0. }, { .0, 0., 0., 1. } };
+			Matrix datamat = new Matrix(dataset);
+			double sum = datamat.sum();
+			if (sum != 4.) {
+				throw new Exception();
+			}
+			try_success("sum()...", "");
+		} catch (Exception e) {
+			errorCount = try_failure(errorCount, "sum()...", "processing error");
+		}
 
 		print("\nTestMatrix completed.\n");
 		print("Total errors reported: " + Integer.toString(errorCount) + "\n");

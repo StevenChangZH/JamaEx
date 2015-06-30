@@ -22,3 +22,8 @@ Update record file
 **Version 0.0.5**
 * Test some of added methods in Matrix and fix bugs. More will be tested tomorrow.
 * Add other files Jama provide. May have bugs.
+
+**Version 0.0.6**
+* Test all methods in Matrix class and fix bugs.
+* Add elementSize, unimus and abs to Matrix3.
+

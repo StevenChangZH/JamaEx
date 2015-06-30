@@ -1624,14 +1624,14 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	public Matrix pdist() {
 
 		// Simplified MatLab version - Euclidean
-		int size = m * n;
+		int size = m;
 		int tpIndex = 0;
 		Matrix X = new Matrix(size * (size - 1) / 2, 1);
 		for (int i = 0; i < m; ++i) {
 			for (int j = i + 1; j < m; ++j, ++tpIndex) {
 				double dist = 0.0;
 				for (int k = 0; k < n; ++k) {
-					Maths.hypot(dist, (A[i][k] - A[j][k]));
+					dist = Maths.hypot(dist, (A[i][k] - A[j][k]));
 				}
 				X.set(tpIndex, 0, dist);
 			}
@@ -1670,7 +1670,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
 	/**
 	 * Simplified implementation of MatLab command squareform. Convert a
-	 * distancvector into a square matrix. Data itself should be a vector. Or it
+	 * distance vector into a square matrix. Data itself should be a vector. Or it
 	 * will throw an exception. Data itself should be a [1, m*(m-1)/2] or
 	 * [m*(m-1)/2, 1] form.
 	 * 
@@ -1792,6 +1792,33 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			if (j == n) {
 				// Find
 				return i;
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Find the first column matching the value, and return its row index.
+	 * 
+	 * @author Steven Chang
+	 * @throws Exception
+	 */
+	public int find_first_col(Matrix col) throws Exception {
+
+		if (col.getColumnDimension() != 1) {
+			throw new IllegalArgumentException("argument must be a column vector");
+		} else if (col.getRowDimension() != m) {
+			throw new IllegalArgumentException(
+					"the argument must have the same rows number");
+		}
+		for (int j=0; j<n; ++j) {
+			int i=0; 
+			for (; i<m; ++i) {
+				if (A[i][j]!=col.get(i))
+					break;
+			}
+			if (i==m) {
+				return j;
 			}
 		}
 		return -1;
@@ -1919,7 +1946,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
 	public Matrix sort() throws Exception {
 
-		return sort(1);
+		double[] array = this.getColumnPackedCopy();
+		quicksort(0, array.length-1, array);
+		Matrix X = new Matrix(array, m);
+		return X;
 	}
 
 	/**
@@ -1932,23 +1962,25 @@ public class Matrix implements Cloneable, java.io.Serializable {
 
 	public Matrix sort(int dim) {
 
-		Matrix X = Matrix.constructWithCopy(A);
 		if (dim == 1) {
-			// ok
+			Matrix X = Matrix.constructWithCopy(A);
+			double[][] array = X.getArray();
+			// For each row, perform quick sort
+			for (int i = 0; i < m; ++i) {
+				quicksort(0, n - 1, array[i]);
+			}
+			return X;
 		} else if (dim == 2) {
-			// Perform transposition
-			X = X.transpose();
+			// For each column, perform quick sort
+			double[] array = this.getColumnPackedCopy();
+			for(int j=0; j<n; ++j) {
+				quicksort(j*m, j*m+m-1, array);
+			}
+			Matrix X = new Matrix(array, m);
+			return X;
 		} else {
 			throw new IllegalArgumentException("dim must be 1 or 2");
 		}
-		// For each row, perform quick sort
-		for (int i = 0; i < m; ++i) {
-			quicksort(0, n - 1, A[i]);
-		}
-		if (dim == 2) {
-			X = X.transpose();
-		}
-		return X;
 	}
 
 	/**
@@ -2045,10 +2077,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		double[][] B = new double[m][n];
 		for (int i = 0; i < m; ++i) {
 			for (int j = 0; j < m; ++j) {
-				if (A[i][j] < 0)
-					B[i][j] = -A[i][j];
-				else
-					B[i][j] = A[i][j];
+				B[i][j] = A[i][j];
+				if (B[i][j] < 0)
+					B[i][j] *= -1;
 			}
 		}
 		return new Matrix(B);
@@ -2068,7 +2099,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 				val += A[i][j];
 			}
 		}
-		return val / this.elementSize();
+		return val;
 	}
 
 	/**
@@ -2088,7 +2119,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			double[][] arr = X.getArray();
 			for (int i = 0; i < m; ++i) {
 				for (int j = 0; j < n; ++j) {
-					arr[i][0] += A[i][j] / n;
+					arr[i][0] += A[i][j];
 				}
 			}
 			return X;
@@ -2098,7 +2129,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 			double[][] arr = X.getArray();
 			for (int i = 0; i < m; ++i) {
 				for (int j = 0; j < n; ++j) {
-					arr[0][j] += A[i][j] / m;
+					arr[0][j] += A[i][j];
 				}
 			}
 			return X;
@@ -2153,8 +2184,9 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		}
 		// Copy and construct
 		Matrix X = new Matrix(numOfDiff, 1);
+		double[][] array = X.getArray();
 		for (int i = 0; i < numOfDiff; ++i) {
-			X.set(i, 0, arr[i]);
+			array[i][0] = arr[i];
 		}
 		return X;
 	}
@@ -2215,34 +2247,32 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		}
 		return X;
 	}
+	
 
 	/*
 	 * ------------------------ Private Methods ------------------------
 	 */
 
 	/** Quick sort method **/
-	private void quicksort(int s, int t, double[] a2) {
-		int i = s, j = t;
-		double x = a2[(int) (i + j) / 2], y;
-		do {
-			while (a2[i] < x)
-				i++;
-			while (a2[i] > x)
-				j--;
-			if (i <= j) {
-				y = a2[i];
-				a2[j] = a2[i];
-				a2[i] = y;
-				i++;
-				j--;
-			}
-		} while (i < j);
-		if (j > s) {
-			quicksort(s, j, a2);
-		}
-		if (i < t) {
-			quicksort(i, t, a2);
-		}
+	private void quicksort(int l, int r, double[] s) {
+		
+		if (l < r) {
+	        int i = l, j = r;
+	        double x = s[l];
+	        while (i < j) {
+	            while(i < j && s[j] >= x) 
+					j--;  
+	            if(i < j) 
+					s[i++] = s[j];
+	            while(i < j && s[i] < x)
+					i++;  
+	            if(i < j) 
+					s[j--] = s[i];
+	        }
+	        s[i] = x;
+	        quicksort(l, i - 1, s); 
+	        quicksort(i + 1, r, s);
+	    }
 	}
 
 	/** Check if size(A) == size(B) **/

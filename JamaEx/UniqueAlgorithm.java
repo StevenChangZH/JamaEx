@@ -5,6 +5,8 @@ package JamaEx;
  * 
  * This class is trying to implement the algorithm of unique in MatLab.
  * 
+ * Not tested yet.
+ * 
  * @author Steven Chang
  * @version 21 June 2015
  */

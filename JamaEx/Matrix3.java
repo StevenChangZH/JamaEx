@@ -5,9 +5,14 @@ import JamaEx.util.Maths;
 /**
  * Jama = Java Matrix class.
  * 
- * Here we also provide a class called Matrix3, which has three dimensions of double data.
- * It has no inheritance relationship with Matrix, and it's also not a wise way to convert a 
- * Mattrix3 object casted to a Matrix object directly without using ctors.
+ * Here we also provide a class called Matrix3, which has three dimensions of
+ * double data. It has no inheritance relationship with Matrix, and it's also
+ * not a wise way to convert a Mattrix3 object casted to a Matrix object
+ * directly without using ctors.
+ * 
+ * Matrix3 is also not a set of Matrix. The total size of Matrix3 is m*n*d3.
+ * 
+ * Not tested yet.
  * 
  * @author Steven Chang
  * @version 20 June 2015
@@ -38,7 +43,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	/*
 	 * ------------------------ Constructors ------------------------
 	 */
-	
+
 	/**
 	 * Construct an m-by-n-by-0 matrix of zeros.
 	 * 
@@ -47,7 +52,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 * @param n
 	 *            Number of columns.
 	 * @param d3
-	 * 			  Number of the third dimension
+	 *            Number of the third dimension
 	 */
 
 	public Matrix3(int m, int n, int d3) {
@@ -65,7 +70,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 * @param n
 	 *            Number of columns.
 	 * @param d3
-	 * 			  Number of the third dimension
+	 *            Number of the third dimension
 	 * @param s
 	 *            Fill the matrix with this scalar value.
 	 */
@@ -76,7 +81,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 		A = new double[m][n][o];
 		for (int i = 0; i < m; ++i) {
 			for (int j = 0; j < n; ++j) {
-				for (int k=0; k<d3; ++k) {
+				for (int k = 0; k < d3; ++k) {
 					A[i][j][k] = s;
 				}
 			}
@@ -101,7 +106,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 				throw new IllegalArgumentException(
 						"All rows must have the same length.");
 			}
-			for(int j=0; j<n; ++j) {
+			for (int j = 0; j < n; ++j) {
 				if (A[i][j].length != d3) {
 					throw new IllegalArgumentException(
 							"All rows must have the same length.");
@@ -121,7 +126,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 * @param n
 	 *            Number of columns.
 	 * @param d3
-	 * 			  Number of the third dimension
+	 *            Number of the third dimension
 	 */
 
 	public Matrix3(double[][][] A, int m, int n, int d3) {
@@ -147,46 +152,48 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	public Matrix3(double vals[], int m, int n) {
 		this.m = m;
 		this.n = n;
-		d3 = ((m != 0&&n!=0) ? vals.length /m/n : 0);
+		d3 = ((m != 0 && n != 0) ? vals.length / m / n : 0);
 		if (m * n * d3 != vals.length) {
 			throw new IllegalArgumentException(
 					"Array length must be a multiple of m.");
 		}
 		A = new double[m][n][d3];
-		for (int k=0; k<d3; ++k) {
+		for (int k = 0; k < d3; ++k) {
 			for (int j = 0; j < n; j++) {
 				for (int i = 0; i < m; i++) {
-					A[i][j][k] = vals[i+j*m+k*m*n];
+					A[i][j][k] = vals[i + j * m + k * m * n];
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * Construct a matrix3 from a Matrix array. Matrix data will be set at row, col dimension.
+	 * Construct a matrix3 from a Matrix array. Matrix data will be set at row,
+	 * col dimension.
 	 * 
 	 * @param matrixArray
 	 *            One-dimensional array of Matrix
 	 * @exception IllegalArgumentException
-	 *                width and length of each element in array must be the same.
+	 *                width and length of each element in array must be the
+	 *                same.
 	 */
 
 	public Matrix3(Matrix[] matrixArray) {
-		
+
 		this.m = matrixArray[0].getRowDimension();
 		this.n = matrixArray[0].getColumnDimension();
-		for (int i=1; i<matrixArray.length; ++i) {
-			if (m != matrixArray[i].getRowDimension() || 
-					n != matrixArray[i].getColumnDimension()) {
+		for (int i = 1; i < matrixArray.length; ++i) {
+			if (m != matrixArray[i].getRowDimension()
+					|| n != matrixArray[i].getColumnDimension()) {
 				throw new IllegalArgumentException(
 						"width and length of each element in array must be the same.");
 			}
 		}
 		// Copy data
-		for (int k=0; k<d3; ++k) {
+		for (int k = 0; k < d3; ++k) {
 			Matrix src = matrixArray[k];
-			for (int i=0; i<m; ++i) {
-				for (int j=0; j<n; ++j) {
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < n; ++j) {
 					A[i][j][k] = src.get(i, j);
 				}
 			}
@@ -196,6 +203,32 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	/*
 	 * ------------------------ Public Methods ------------------------
 	 */
+
+	/**
+	 * Generate matrix with random elements
+	 * 
+	 * @param m
+	 *            Number of rows.
+	 * @param n
+	 *            Number of colums.
+	 * @param d3
+	 *            Number of the third dimension.
+	 * @return An m-by-n-by-r3 matrix with uniformly distributed random
+	 *         elements.
+	 */
+
+	public static Matrix3 random(int m, int n, int d3) {
+		Matrix3 A = new Matrix3(m, n, d3);
+		double[][][] X = A.getArray();
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				for (int k = 0; k < d3; ++k) {
+					X[i][j][k] = Math.random();
+				}
+			}
+		}
+		return A;
+	}
 
 	/**
 	 * Construct a matrix3 from a copy of a 3-D array.
@@ -210,33 +243,33 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 		int m = A.length;
 		int n = A[0].length;
 		int d3 = A[0][0].length;
-		
+
 		// Check
 		for (int i = 0; i < m; i++) {
 			if (A[i].length != n) {
 				throw new IllegalArgumentException(
 						"All rows must have the same length.");
 			}
-			for(int j=0; j<n; ++j) {
+			for (int j = 0; j < n; ++j) {
 				if (A[i][j].length != d3) {
 					throw new IllegalArgumentException(
 							"All rows must have the same length.");
 				}
 			}
 		}
-		
-		Matrix3 X = new Matrix3(m,n,d3);
+
+		Matrix3 X = new Matrix3(m, n, d3);
 		// Copy data
-		for (int j=0; j<n; ++j) {
-			for (int i=0; i<m; ++i) {
-				for (int k=0; k<d3; ++k) {
+		for (int j = 0; j < n; ++j) {
+			for (int i = 0; i < m; ++i) {
+				for (int k = 0; k < d3; ++k) {
 					X.set(i, j, k, A[i][j][k]);
 				}
 			}
 		}
 		return X;
 	}
-	
+
 	/**
 	 * Make a deep copy of a matrix
 	 */
@@ -246,7 +279,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 		double[][][] C = X.getArray();
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < n; j++) {
-				for (int k=0; k<d3; ++k) {
+				for (int k = 0; k < d3; ++k) {
 					C[i][j] = A[i][j];
 				}
 			}
@@ -271,7 +304,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	public double[][][] getArray() {
 		return A;
 	}
-	
+
 	/**
 	 * Get row dimension.
 	 * 
@@ -291,7 +324,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	public int getColumnDimension() {
 		return n;
 	}
-	
+
 	/**
 	 * Get the third dimension.
 	 * 
@@ -301,7 +334,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	public int getThirdDimension() {
 		return d3;
 	}
-	
+
 	/**
 	 * Get a single element.
 	 * 
@@ -310,7 +343,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 * @param j
 	 *            Column index.
 	 * @param k
-	 * 			  The third dimension index
+	 *            The third dimension index
 	 * @return A(i, j, k)
 	 * @exception ArrayIndexOutOfBoundsException
 	 */
@@ -318,7 +351,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	public double get(int i, int j, int k) {
 		return A[i][j][k];
 	}
-	
+
 	/**
 	 * Get a single element from the index. Search order: m-n-d3
 	 * 
@@ -329,13 +362,13 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 */
 
 	public double get(int index) {
-		int row = index/m/n;
-		int val = (index-row)/m;
-		int col = val%n;
-		int dim3 = val/n;
+		int row = index / m / n;
+		int val = (index - row) / m;
+		int col = val % n;
+		int dim3 = val / n;
 		return A[row][col][dim3];
 	}
-	
+
 	/**
 	 * Get a submatrix.
 	 * 
@@ -358,7 +391,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 		try {
 			for (int i = i0; i <= i1; i++) {
 				for (int j = j0; j <= j1; j++) {
-					for(int k=k0; k<=k1; ++k) {
+					for (int k = k0; k <= k1; ++k) {
 						B[i - i0][j - j0][k - k0] = A[i][j][k];
 					}
 				}
@@ -368,7 +401,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 		}
 		return X;
 	}
-	
+
 	/**
 	 * Set a single element.
 	 * 
@@ -377,7 +410,7 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 * @param j
 	 *            Column index.
 	 * @param k
-	 * 			  The third dimension index
+	 *            The third dimension index
 	 * @param s
 	 *            A(i,j,k).
 	 * @exception ArrayIndexOutOfBoundsException
@@ -386,26 +419,25 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	public void set(int i, int j, int k, double s) {
 		A[i][j][k] = s;
 	}
-	
+
 	/**
 	 * Set a single element.
 	 * 
 	 * @param index
-	 * 			  index of elements
+	 *            index of elements
 	 * @param value
-	 * 			  value to be set
-	 *            A(i,j,k).
+	 *            value to be set A(i,j,k).
 	 * @exception ArrayIndexOutOfBoundsException
 	 */
-	
+
 	public void set(int index, double value) {
-		int row = index/m/n;
-		int val = (index-row)/m;
-		int col = val%n;
-		int dim3 = val/n;
+		int row = index / m / n;
+		int val = (index - row) / m;
+		int col = val % n;
+		int dim3 = val / n;
 		A[row][col][dim3] = value;
 	}
-	
+
 	/**
 	 * Get the a Matrix from specified dimension.
 	 * 
@@ -415,38 +447,84 @@ public class Matrix3 implements Cloneable, java.io.Serializable {
 	 *            Dimension index, which index searched.
 	 */
 
-	public Matrix getMatrix(int index, int dim) throws Exception{
-		
-		if (dim==1) {
+	public Matrix getMatrix(int index, int dim) throws Exception {
+
+		if (dim == 1) {
 			// Row dimension
 			Matrix result = Matrix.constructWithCopy(A[index]);
 			return result;
-		} else if (dim==2) {
+		} else if (dim == 2) {
 			// Column dimension
 			Matrix result = new Matrix(m, d3);
-			for (int i=0; i<m; ++i) {
-				for(int k=0; k<d3; ++k) {
+			for (int i = 0; i < m; ++i) {
+				for (int k = 0; k < d3; ++k) {
 					result.set(i, k, A[i][dim][k]);
 				}
 			}
 			return result;
-		} else if (dim==3) {
+		} else if (dim == 3) {
 			// the third dimension
 			Matrix result = new Matrix(m, n);
 			// Copy the data
-			for (int i=0; i<m; ++i) {
-				for(int j=0; j<n; ++j) {
+			for (int i = 0; i < m; ++i) {
+				for (int j = 0; j < n; ++j) {
 					result.set(i, j, A[i][j][dim]);
 				}
 			}
 			return result;
-		} else  {
-			throw new IllegalArgumentException(
-					"Dimension must be 1, 2 or 3");
+		} else {
+			throw new IllegalArgumentException("Dimension must be 1, 2 or 3");
 		}
 	}
-	
-	
+
+	/**
+	 * Return the size of elements. m*n*d3.
+	 * 
+	 */
+	public int elementSize() {
+		return m * n * d3;
+	}
+
+	/**
+	 * Perform abs() method for all elements in the matrix.
+	 * 
+	 */
+
+	public Matrix3 abs() throws Exception {
+
+		double[][][] B = new double[m][n][d3];
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < m; ++j) {
+				for (int k = 0; k < d3; ++k) {
+					B[i][j][k] = A[i][j][k];
+					if (B[i][j][k] < 0) {
+						B[i][j][k] *= -1.;
+					}
+				}
+			}
+		}
+		return new Matrix3(B);
+	}
+
+	/**
+	 * Unary minus
+	 * 
+	 * @return -A
+	 */
+
+	public Matrix3 uminus() {
+		Matrix3 X = this.copy();
+		double[][][] C = X.getArray();
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				for (int k = 0; k < d3; ++k) {
+					C[i][j][k] = -C[i][j][k];
+				}
+			}
+		}
+		return X;
+	}
+
 	/*
 	 * ------------------------ Private Methods ------------------------
 	 */

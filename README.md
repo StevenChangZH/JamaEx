@@ -23,6 +23,7 @@ Matrix equalsSustitute(double value, double substitute);
 void fill(double start, double end);
 Matrix find(double value);
 int find_first(double value);
+int find_first_col(Matrix col);
 int find_first_row(Matrix row);
 int find_number(double value);
 double get(int index);
@@ -43,7 +44,7 @@ Matrix reshape(int nrow, int ncol);
 Matrix reshape(int nrow, int ncol, double fit);
 Matrix reverse();
 void reverseEqual();
-Matrix pdist(Matrix matrix);
+Matrix pdist();
 void set(int index, double val);
 Matrix setdiff(Matrix mat);
 Matrix sort();
@@ -57,4 +58,4 @@ private void quicksort(int s, int t, double[] a2);
 
 Add another class called Matrix3. More methods will be updated later.
 
-Tests do not cover all for now. Later I'll add test codes.
+Tests do not cover all for now. Later I'll add more test codes.
